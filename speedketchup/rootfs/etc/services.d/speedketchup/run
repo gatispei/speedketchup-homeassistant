@@ -1,0 +1,63 @@
+#!/usr/bin/with-contenv bashio
+# shellcheck shell=bash
+# ==============================================================================
+# Start speedketchup with the app options as SPEEDKETCHUP_* environment
+# variables. The MQTT broker of the Mosquitto app is used when no broker is set.
+# ==============================================================================
+
+# results in the app's own /data, persistent and part of backups
+export SPEEDKETCHUP_FILE=/data/speedketchup-results.csv
+# ingress and the optional port both reach it from outside the container
+export SPEEDKETCHUP_ADDRESS=0.0.0.0
+export SPEEDKETCHUP_PORT=8080
+
+# whether an app (Mosquitto) provides the mqtt service. Asks the services list
+# rather than bashio::services.available, which logs an error when there is none
+mqtt_service_available() {
+    local available
+    available=$(bashio::api.supervisor GET /services false \
+        '.services[] | select(.slug == "mqtt") | .available') || return 1
+    bashio::var.true "${available}"
+}
+
+export SPEEDKETCHUP_INTERVAL="$(bashio::config 'interval')"
+export SPEEDKETCHUP_DOWNLOAD_DURATION="$(bashio::config 'download_duration')"
+export SPEEDKETCHUP_UPLOAD_DURATION="$(bashio::config 'upload_duration')"
+export SPEEDKETCHUP_DOWNLOAD_CONNECTIONS="$(bashio::config 'download_connections')"
+export SPEEDKETCHUP_UPLOAD_CONNECTIONS="$(bashio::config 'upload_connections')"
+
+if bashio::config.has_value 'server'; then
+    export SPEEDKETCHUP_SERVER="$(bashio::config 'server')"
+fi
+
+if bashio::config.has_value 'influx_url'; then
+    export SPEEDKETCHUP_INFLUX_URL="$(bashio::config 'influx_url')"
+    if bashio::config.has_value 'influx_token'; then
+        export SPEEDKETCHUP_INFLUX_TOKEN="$(bashio::config 'influx_token')"
+    fi
+fi
+
+if bashio::config.has_value 'mqtt_host'; then
+    export SPEEDKETCHUP_MQTT="$(bashio::config 'mqtt_host')"
+    if bashio::config.has_value 'mqtt_user'; then
+        export SPEEDKETCHUP_MQTT_USER="$(bashio::config 'mqtt_user')"
+    fi
+    if bashio::config.has_value 'mqtt_password'; then
+        export SPEEDKETCHUP_MQTT_PASSWORD="$(bashio::config 'mqtt_password')"
+    fi
+    bashio::log.info "MQTT: using the broker at ${SPEEDKETCHUP_MQTT}"
+elif bashio::config.true 'mqtt_auto' && mqtt_service_available; then
+    if bashio::var.true "$(bashio::services 'mqtt' 'ssl')"; then
+        bashio::log.warning "MQTT: the broker app only offers TLS, which speedketchup does not support, not publishing"
+    else
+        export SPEEDKETCHUP_MQTT="$(bashio::services 'mqtt' 'host'):$(bashio::services 'mqtt' 'port')"
+        export SPEEDKETCHUP_MQTT_USER="$(bashio::services 'mqtt' 'username')"
+        export SPEEDKETCHUP_MQTT_PASSWORD="$(bashio::services 'mqtt' 'password')"
+        bashio::log.info "MQTT: using the broker app at ${SPEEDKETCHUP_MQTT}"
+    fi
+else
+    bashio::log.info "MQTT: no broker, not publishing"
+fi
+
+bashio::log.info "Starting speedketchup, a test every ${SPEEDKETCHUP_INTERVAL} minutes"
+exec /usr/bin/speedketchup

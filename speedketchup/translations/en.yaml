@@ -1,0 +1,52 @@
+configuration:
+  interval:
+    name: Test interval
+    description: Minutes between speed tests.
+  server:
+    name: Speedtest server
+    description: >-
+      host[:port] of a speedtest.net server to always test against, port 8080 by
+      default. Leave empty to pick the server with the lowest latency.
+  download_duration:
+    name: Download duration
+    description: Seconds to test the download speed, 0 skips the download test.
+  upload_duration:
+    name: Upload duration
+    description: Seconds to test the upload speed, 0 skips the upload test.
+  download_connections:
+    name: Download connections
+    description: Parallel connections for the download test.
+  upload_connections:
+    name: Upload connections
+    description: Parallel connections for the upload test.
+  influx_url:
+    name: InfluxDB write URL
+    description: >-
+      Also write every result to this InfluxDB line protocol write url, http
+      only, for example
+      http://a0d7b954-influxdb:8086/write?db=speedketchup&u=user&p=password
+      for the InfluxDB app.
+  influx_token:
+    name: InfluxDB token
+    description: "Sent as 'Authorization: Token <token>' with every write."
+  mqtt_auto:
+    name: Use the Mosquitto broker app
+    description: >-
+      When no MQTT broker is set below, publish the results to the broker of
+      the Mosquitto broker app, if it is installed, so the SpeedKetchup sensors
+      show up in Home Assistant by themselves.
+  mqtt_host:
+    name: MQTT broker
+    description: >-
+      host[:port] of an MQTT broker to publish every result to, port 1883 by
+      default, plain MQTT only. Takes precedence over the Mosquitto broker app.
+  mqtt_user:
+    name: MQTT user
+    description: User name for the MQTT broker set above.
+  mqtt_password:
+    name: MQTT password
+    description: Password for the MQTT broker set above.
+network:
+  8080/tcp: >-
+    Web page, Prometheus metrics at /metrics and the built in speedtest server.
+    Not needed for the page in the Home Assistant sidebar.
