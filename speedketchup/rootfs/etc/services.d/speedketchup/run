@@ -9,7 +9,7 @@
 export SPEEDKETCHUP_FILE=/data/speedketchup-results.csv
 # ingress and the optional port both reach it from outside the container
 export SPEEDKETCHUP_ADDRESS=0.0.0.0
-export SPEEDKETCHUP_PORT=8080
+export SPEEDKETCHUP_PORT=8288
 
 # whether an app (Mosquitto) provides the mqtt service. Asks the services list
 # rather than bashio::services.available, which logs an error when there is none

@@ -81,9 +81,9 @@ http://influxdb:8086/api/v2/write?org=home&bucket=speedketchup
 
 ## Network port
 
-The page in the sidebar needs no port. Map the **8080/tcp** port in the
+The page in the sidebar needs no port. Map the **8288/tcp** port in the
 **Network** section to also reach SpeedKetchup directly at
-`http://homeassistant.local:8080`, to scrape its Prometheus metrics at `/metrics`,
+`http://homeassistant.local:8288`, to scrape its Prometheus metrics at `/metrics`,
 or to use it as a speedtest server for other speedketchup instances. Anyone who
 can reach that port can see the results and start a test, there is no login.
 

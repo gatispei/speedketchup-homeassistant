@@ -1,6 +1,6 @@
 # https://contributors.home-assistant.io/apps/guides/dockerfile/
 ARG BUILD_FROM=ghcr.io/home-assistant/base:3.24
-ARG SPEEDKETCHUP_VERSION=0.4.0
+ARG SPEEDKETCHUP_VERSION=0.5.0
 
 # the official image is FROM scratch with just the static binary, BuildKit
 # picks the platform matching the one being built
@@ -14,7 +14,7 @@ COPY rootfs /
 # the Supervisor restarts the app when this fails, every connection logs a
 # line or two, so not too often
 HEALTHCHECK --interval=5m --timeout=10s --start-period=1m --start-interval=5s --retries=3 \
-    CMD curl -fsS -o /dev/null http://127.0.0.1:8080/metrics || exit 1
+    CMD curl -fsS -o /dev/null http://127.0.0.1:8288/metrics || exit 1
 
 LABEL \
     org.opencontainers.image.title="Home Assistant App: SpeedKetchup" \

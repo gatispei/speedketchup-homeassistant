@@ -47,6 +47,6 @@ configuration:
     name: MQTT password
     description: Password for the MQTT broker set above.
 network:
-  8080/tcp: >-
+  8288/tcp: >-
     Web page, Prometheus metrics at /metrics and the built in speedtest server.
     Not needed for the page in the Home Assistant sidebar.
